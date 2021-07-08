@@ -39,13 +39,33 @@ npx -p @storybook/cli sb init
 │             └── .....
 ```
 
-其中.storybook文件用于配置一些storybook的整体配置。cli脚手架已自动配置好了main.js和preview.js。
+其中，`.storybook`文件用于配置一些storybook的整体配置。cli脚手架已自动配置好了`main.js`和`preview.js`。
 
-同时，storybook模板还为我们提供了一些组件样例，这些组件的样例都存放在src/stories中，统一命名为xxx.stories.js
+同时，storybook模板还为我们提供了一些组件样例，这些组件的样例都存放在`src/stories`中，统一命名为`xxx.stories.js`
+
+为了区分组件与stories文档，我们一般会对组件的目录进行修改，将组件主文件和文档文件分开存放。
+
+```
+├── .storybook
+│       │── main.js         //主文件
+│       └── preview.js      //预览设置文件
+│
+├─ src 
+│    └── stories
+│             │── assets              //用于存放静态资源的文件夹
+│             │── Button.stories.jsx  //按钮组件文档文件
+│             │── Introduction.stories.mdx //欢迎介绍页面
+│             └── .....
+│    └── components
+│             │── assets  
+│             │── button.css          //按钮组件样式文件
+│             │── Button.jsx          //按钮组件主文件  
+│             └── .....
+```
 
 ### 1. main.js
 
-.storybook中的main.js文件主要用于读取组件和接口，它可以设置storybook读取哪个文件夹的内容，匹配文件夹中的哪些文件。如果要匹配css，则需要预先安装loader
+`.storybook`中的`main.js`文件主要用于读取组件和接口，它可以设置storybook读取哪个文件夹的内容，匹配文件夹中的哪些文件。如果要匹配css，则需要预先安装loader
 
 ```javascript
 const path = require('path');
@@ -82,7 +102,7 @@ main文件还用于描述引入的插件，可以在此处添加一些你需要�
 
 ### 2. preview.js
 
-preview.js主要用于进行一些全局设置以及自定义左侧导航栏的排列顺序。这个文件可以配置全局（即所有组件）的显示属性
+`preview.js`主要用于进行一些全局设置以及自定义左侧导航栏的排列顺序。这个文件可以配置全局（即所有组件）的显示属性
 
 ```javascript
 export const parameters = {
@@ -104,13 +124,13 @@ export const parameters = {
 }
 ```
 
-例如，这里设置默认主题为'light'，组件的显示方式为居中，控制栏自定义了color和date的匹配规则，以及设置为控制栏显示全部属性，文档部位内联布局。
+例如，这里设置默认主题为`light`，组件的显示方式为居中，控制栏自定义了color和date的匹配规则，以及设置为控制栏显示全部属性，文档部位内联布局。
 
 此时，在完成基础的配置后，运行`yarn storybook`即可预览出基础的组件库。
 
 ## 组件库文档添加组件
 
-接下来，可以对已有的组件进行编辑，添加组件文档。组件文档有两种编写方式，Component Story Format(CSF) 和 MDX。CSF采用JSX的方式编辑，而MDX则是通过markdown与jsx结合的方式来编写文档，这两者都存在各自的优势。
+接下来，可以对已有的组件进行编辑，添加组件文档。组件文档有两种编写方式，Component Story Format(CSF) 和 MDX。CSF采用JSX的方式编辑，而MDX则是通过Markdown与jsx结合的方式来编写文档，这两者都存在各自的优势。
 
 首先，我们完成一个组件的构建，以按钮Button组件为例，我们基于react构建了一个button按钮，同时为组件添加prop-types包，定义组件每个属性的propTypes后，storybook可以读取组件的属性，生成controls控制台。同时，也会接收属性的defaultProps（默认值）。
 
@@ -192,7 +212,10 @@ Primary.args = {
 
 ```
 
-此时运行`storybook`命令，则可以生成一个基础的组件文档。
+此时运行`yarn storybook`命令，则可以生成一个基础的组件文档。
+
+![基础文档]()
+
 同时，我们可能需要同时展示一个组件的多个形态，以展示组件的属性。因此我们可以在文档中创建多个具有不同属性的组件
 
 ```javascript
@@ -222,7 +245,7 @@ Small.args = {
 };
 ```
 
-上述代码通过`Template.bind({})`方式复制了多个组件，每一个这样的组件称为一个**story**。一个component可以生成多个story，这些story可以在docs文档中被调用。
+上述代码通过`Template.bind({})`方式复制了多个组件，每一个这样的组件称为一个**story**（故事）。一个component可以生成多个story，这些story可以在docs文档中被调用。
 
 ## 进一步地优化组件文档
 
@@ -239,6 +262,8 @@ Small.args = {
 首先，在生成文档后，可以观察文档的结构，由canvas与docs构成。canvas只用于展示组件，并对组件进行操作，且控制台默认只展示Name(组件名)与Control(属性值)。可以通过在`preview.js`中设置显示全部属性。
 
 ```javascript
+// preview.js
+
 export const parameters = {
   controls: {
     expanded: true
@@ -250,6 +275,7 @@ export const parameters = {
 
 ```javascript
 // Alert.stories.js
+
 import React from 'react';
 import { Alert } from './Alert';
 
@@ -281,6 +307,38 @@ export default {
 ```
 
 这时我们可以看到已经为`text`和`type`两个属性的Default栏添加了默认值标签。
+
+![默认值显示](https://github.com/Dasiylight/note/blob/master/picture/defaultValue.png?raw=true)
+
+除此之外，还可以通过在组件主文件中添加注释的方式，来直接对组件的各个参数添加描述。在组件的propTypes属性中，在每个参数上添加注释，组件文档即可自动导入描述
+
+```javascript
+// Button.jsx
+
+Button.propTypes = {
+  /**
+   * Is this the principal call to action on the page?
+   */
+  primary: PropTypes.bool,
+  /**
+   * What background color to use
+   */
+  backgroundColor: PropTypes.string,
+  /**
+   * How large should the button be?
+   */
+  size: PropTypes.oneOf(['small', 'medium', 'large']),
+  /**
+   * Button contents
+   */
+  label: PropTypes.string.isRequired,
+  /**
+   * Optional click handler
+   */
+  onClick: PropTypes.func,
+};
+
+```
 
 ### 文档描述优化
 
@@ -404,12 +462,11 @@ Docs Block虽然将整个Docs页面拆分开来，进行自定义，但仍有一
 import { Meta, Story, Canvas, argTypes, Props, ArgsTable } from '@storybook/addon-docs';
 
 import { TeaBadge as Badge } from '../../web/components/Badge';
-import { createMeta, getMetaData, getDefaults } from "../utils/helper";
 
 <Meta 
-  title={createMeta('Badge')} 
+  title={"展示/徽章(Badge)"} 
   component={Badge}
-  argTypes={getMetaData('Badge')}/>
+/>
 
 export const Template = (args) => <Badge {...args} />
 
@@ -445,8 +502,14 @@ export const Template = (args) => <Badge {...args} />
   <Story name="dot-type">
     <Badge theme="default" pattern="dot"/>
   </Story>
+  <Story name="ring-type">
+    <Badge theme="default" pattern="ring"/>
+  </Story>
 </Canvas>
 ```
 
-首先，MDX与js对组件的引入方式类似，只是将js中`export default`替换为MDX的`<Meta>`标签，需要注意的是，MDX中的标签都需要提前引入。我们同样可以暴露一个基本的组件Template,并且调用它作为一个story。不同的是，MDX可以更灵活的对story进行展示：可以单独定义一个story展示，也可以将story放入`Canvas`中展示，可以展示组件的代码，并且可以通过argsTable更改组件。也可以将多个组件放入同一个`Canvas`中一起展示...
+生成的文档效果如下图
 
+MDX与js对组件的引入方式类似，只是将js中`export default`替换为MDX的`<Meta>`标签，需要注意的是，MDX中的标签都需要提前引入。我们同样可以暴露一个基本的组件Template,并且调用它作为一个story。不同的是，MDX可以更灵活的对story进行展示：可以单独定义一个story展示，也可以将story放入`Canvas`中展示，可以展示组件的代码，并且可以通过argsTable更改组件。也可以将多个组件放入同一个`Canvas`中一起展示...
+
+总之，MDX的编写方式与文档更加相似，因此如果需要一份详细的组件文档描述，采用MDX格式来编写或许是更好的选择。
