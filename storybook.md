@@ -1,4 +1,4 @@
-# storybook初探  
+# storybook初探：利用storybook构建组件文档库 
 
 Storybook常用来打造团队的UI组件库，它可以对各个组件进行测试与编写文档。Storybook可以用于React，Vue和Angular上，本文主要介绍Storybook + React系统的构建。
 
@@ -56,8 +56,7 @@ npx -p @storybook/cli sb init
 │             │── Button.stories.jsx  //按钮组件文档文件
 │             │── Introduction.stories.mdx //欢迎介绍页面
 │             └── .....
-│    └── components
-│             │── assets  
+│    └── components 
 │             │── button.css          //按钮组件样式文件
 │             │── Button.jsx          //按钮组件主文件  
 │             └── .....
@@ -65,23 +64,12 @@ npx -p @storybook/cli sb init
 
 ### 1. main.js
 
-`.storybook`中的`main.js`文件主要用于读取组件和接口，它可以设置storybook读取哪个文件夹的内容，匹配文件夹中的哪些文件。如果要匹配css，则需要预先安装loader
+`.storybook`中的`main.js`文件主要用于读取组件和接口，它可以设置storybook读取哪个文件夹的内容，匹配文件夹中的哪些文件。
 
 ```javascript
 const path = require('path');
 
 module.exports = {
-
-  //使用scss,使用前记得安装对应的loader
-  webpackFinal: async (config, { configType }) => {
-    config.module.rules.push({
-      test: /\.scss$/,
-      use: ['style-loader', 'css-loader', 'sass-loader'],
-      include: path.resolve(__dirname, '../'),
-    });
-
-    return config;
-  },
 
   // 配置引入组件的路径
   stories: [
@@ -117,10 +105,7 @@ export const parameters = {
       date: /Date$/,
     },
     expanded: true
-  },
-  docs: {
-    inlineStories: false,
-  },
+  }
 }
 ```
 
@@ -132,7 +117,7 @@ export const parameters = {
 
 接下来，可以对已有的组件进行编辑，添加组件文档。组件文档有两种编写方式，Component Story Format(CSF) 和 MDX。CSF采用JSX的方式编辑，而MDX则是通过Markdown与jsx结合的方式来编写文档，这两者都存在各自的优势。
 
-首先，我们完成一个组件的构建，以按钮Button组件为例，我们基于react构建了一个button按钮，同时为组件添加prop-types包，定义组件每个属性的propTypes后，storybook可以读取组件的属性，生成controls控制台。同时，也会接收属性的defaultProps（默认值）。
+我们先以默认的CSF（即JSX）编写方式来展开。首先，我们完成一个组件的构建，以按钮Button组件为例，我们基于react构建了一个button按钮，同时为组件添加prop-types包，定义组件每个属性的propTypes后，storybook可以读取组件的属性，生成controls控制台。同时，也会接收属性的defaultProps（默认值）。
 
 ```javascript
 import React from 'react';
@@ -214,7 +199,7 @@ Primary.args = {
 
 此时运行`yarn storybook`命令，则可以生成一个基础的组件文档。
 
-![基础文档]()
+![基础文档](https://github.com/Dasiylight/note/blob/master/picture/basic.png?raw=true)
 
 同时，我们可能需要同时展示一个组件的多个形态，以展示组件的属性。因此我们可以在文档中创建多个具有不同属性的组件
 
@@ -346,7 +331,7 @@ Button.propTypes = {
 
 首先，当需要子组件来对组件进行辅助描述时，可以利用subcomponents将子组件的属性一同列举出来。  
 
-例如：Form和FormItem
+例如：`Form`和`FormItem`
 
 ```javascript
 // ButtonGroup.stories.js
@@ -509,6 +494,8 @@ export const Template = (args) => <Badge {...args} />
 ```
 
 生成的文档效果如下图
+
+![采用mdx编写的文档](https://github.com/Dasiylight/note/blob/master/picture/mdx.png?raw=true)
 
 MDX与js对组件的引入方式类似，只是将js中`export default`替换为MDX的`<Meta>`标签，需要注意的是，MDX中的标签都需要提前引入。我们同样可以暴露一个基本的组件Template,并且调用它作为一个story。不同的是，MDX可以更灵活的对story进行展示：可以单独定义一个story展示，也可以将story放入`Canvas`中展示，可以展示组件的代码，并且可以通过argsTable更改组件。也可以将多个组件放入同一个`Canvas`中一起展示...
 
