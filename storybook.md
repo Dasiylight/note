@@ -232,6 +232,8 @@ Small.args = {
 
 上述代码通过`Template.bind({})`方式复制了多个组件，每一个这样的组件称为一个**story**（故事）。一个component可以生成多个story，这些story可以在docs文档中被调用。
 
+![story](https://github.com/Dasiylight/note/blob/master/picture/story.png?raw=true)
+
 ## 进一步地优化组件文档
 
 在生成了一个基础文档后，可以进一步对文档进行编辑来更好的展示组件。可以从以下几点来对文档进行优化。
